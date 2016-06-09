@@ -74,6 +74,7 @@ defmodule MutableEach do
     end
   end
 
+  @doc false
   defmacro continue do
     quote do
       {mutable_var_values, _} =
@@ -83,6 +84,7 @@ defmodule MutableEach do
     end
   end
 
+  @doc false
   defmacro break do
     quote do
       {mutable_var_values, _} =
