@@ -36,4 +36,14 @@ defmodule MutableEachTest do
     assert c == [2, 1]
     assert d == :ok
   end
+
+  test "each matching" do
+    a = 1
+
+    each {:ok, item} <- [{:ok, 1}, {:ok, 2}, {:ok, 3}],
+      mutable: [a],
+      do: a = item
+
+    assert a == 3
+  end
 end

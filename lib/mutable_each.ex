@@ -36,12 +36,11 @@ defmodule MutableEach do
       d #=> :ok
   """
 
-  defmacro each(item_enumerable, [mutable: mutable, do: do_clause]) do
-    do_each(item_enumerable, mutable, do_clause)
-  end
+  defmacro each(item_enumerable, mutable, clauses \\ []) do
+    mutable_vars = Keyword.get(mutable, :mutable, [])
+    do_clause = Enum.find([mutable, clauses], &Keyword.get(&1, :do))
 
-  defmacro each(item_enumerable, [mutable: mutable], [do: do_clause]) do
-    do_each(item_enumerable, mutable, do_clause)
+    do_each(item_enumerable, mutable_vars, do_clause)
   end
 
   defmacro continue do
