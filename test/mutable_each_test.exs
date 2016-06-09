@@ -1,6 +1,6 @@
 defmodule MutableEachTest do
   use ExUnit.Case
-  import MutableEach
+  use MutableEach
 
   test "each" do
     a = 1

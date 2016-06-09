@@ -2,6 +2,8 @@ defmodule MutableEach do
   @moduledoc """
   Implements imperative-style mutable iteration:
 
+      use MutableEach
+
       a = 1
       b = 2
       c = []
@@ -35,6 +37,12 @@ defmodule MutableEach do
       c #=> [2, 1]
       d #=> :ok
   """
+
+  defmacro __using__(_args) do
+    quote do
+      import MutableEach, only: [each: 2, each: 3]
+    end
+  end
 
   defmacro each({:<-, _, [item, enumerable]}, mutable, clauses \\ []) do
     mutable_vars = Keyword.get(mutable, :mutable, {})
