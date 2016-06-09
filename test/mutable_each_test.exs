@@ -8,7 +8,7 @@ defmodule MutableEachTest do
     c = []
     d = :ok
 
-    each item <- [1, 2, 3, 4, 5], mutable: [a, b, c] do
+    each item <- [1, 2, 3, 4, 5], mutable: {a, b, c} do
       d = :not_ok
 
       b = item
@@ -41,7 +41,7 @@ defmodule MutableEachTest do
     a = 1
 
     each {:ok, item} <- [{:ok, 1}, {:ok, 2}, {:ok, 3}],
-      mutable: [a],
+      mutable: {a},
       do: a = item
 
     assert a == 3

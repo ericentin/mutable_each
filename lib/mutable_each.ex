@@ -7,7 +7,7 @@ defmodule MutableEach do
       c = []
       d = :ok
 
-      each item <- [1, 2, 3, 4, 5], mutable: [a, b, c] do
+      each item <- [1, 2, 3, 4, 5], mutable: {a, b, c} do
         d = :not_ok
 
         b = item
@@ -36,33 +36,9 @@ defmodule MutableEach do
       d #=> :ok
   """
 
-  defmacro each(item_enumerable, mutable, clauses \\ []) do
-    mutable_vars = Keyword.get(mutable, :mutable, [])
+  defmacro each({:<-, _, [item, enumerable]}, mutable, clauses \\ []) do
+    mutable_vars = Keyword.get(mutable, :mutable, {})
     do_clause = Enum.find([mutable, clauses], &Keyword.get(&1, :do))
-
-    do_each(item_enumerable, mutable_vars, do_clause)
-  end
-
-  defmacro continue do
-    quote do
-      {mutable_var_values, _} =
-        Code.eval_quoted(var!(mutable_vars, __MODULE__), binding(), __ENV__)
-
-      throw {:mutable_each_continue, mutable_var_values}
-    end
-  end
-
-  defmacro break do
-    quote do
-      {mutable_var_values, _} =
-        Code.eval_quoted(var!(mutable_vars, __MODULE__), binding(), __ENV__)
-
-      throw {:mutable_each_break, mutable_var_values}
-    end
-  end
-
-  defp do_each({:<-, _, [item, enumerable]}, mutable, do_clause) do
-    mutable_vars = quote do: {unquote_splicing(mutable)}
 
     quote do
       var!(mutable_vars, __MODULE__) = unquote(Macro.escape(mutable_vars))
@@ -87,6 +63,24 @@ defmodule MutableEach do
         Enum.reduce_while(unquote(enumerable), unquote(mutable_vars), fun)
 
       :ok
+    end
+  end
+
+  defmacro continue do
+    quote do
+      {mutable_var_values, _} =
+        Code.eval_quoted(var!(mutable_vars, __MODULE__), binding(), __ENV__)
+
+      throw {:mutable_each_continue, mutable_var_values}
+    end
+  end
+
+  defmacro break do
+    quote do
+      {mutable_var_values, _} =
+        Code.eval_quoted(var!(mutable_vars, __MODULE__), binding(), __ENV__)
+
+      throw {:mutable_each_break, mutable_var_values}
     end
   end
 end
